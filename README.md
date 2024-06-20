@@ -10,4 +10,3 @@ Tic Tac Toe is a classic two-player game where the objective is to be the first 
 
 ## User Interface States
 ![Main Menu](./docs/design_system/main_menu.png)
-![Gameplay](./docs/design_system/play_area.png)
