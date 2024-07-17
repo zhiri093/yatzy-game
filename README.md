@@ -8,5 +8,11 @@ Tic Tac Toe is a classic two-player game where the objective is to be the first 
 2. The first player to get three of their symbols (X or O) in a row (horizontally, vertically, or diagonally) wins the game.
 3. If all nine squares are filled and neither player has three in a row, the game is a draw.
 
+## How to Run app
+1. Download/Install PHP
+2. Enter the directory where all program files are stored (tictactoe folder)
+3. Run command php -S localhost:8000 in the command prompt in right directory (C:\Users\yourPCName\OneDrive\Desktop\yatzy-game\tictactoe)
+4. Type http://localhost:8000/index.html to access main page/game
+
 ## User Interface States
 ![Main Menu](./docs/design_system/main_menu.png)
