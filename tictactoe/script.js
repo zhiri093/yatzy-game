@@ -1,78 +1,74 @@
-const cells = document.querySelectorAll('.cell');
-const resetButton = document.getElementById('reset');
-const player = 'X';
-const ai = 'O';
-let board = Array(9).fill(null);
+$(document).ready(function() {
+    const cells = document.querySelectorAll('.cell');
+    const resetButton = document.getElementById('reset');
 
-// Winning combinations
-const winningCombinations = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-];
-
-// Check for a win or a tie
-function checkWinner(board) {
-    for (let combination of winningCombinations) {
-        const [a, b, c] = combination;
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            return board[a];
-        }
-    }
-    return board.includes(null) ? null : 'Tie';
-}
-
-// AI makes a move
-function aiMove() {
-    let availableCells = board.map((cell, index) => cell === null ? index : null).filter(val => val !== null);
-    let move = availableCells[Math.floor(Math.random() * availableCells.length)];
-    board[move] = ai;
-    cells[move].innerText = ai;
-    cells[move].removeEventListener('click', handleCellClick);
-    if (checkWinner(board)) {
-        endGame();
-    }
-}
-
-// Handle cell click
-function handleCellClick(event) {
-    const index = event.target.getAttribute('data-index');
-    if (!board[index]) {
-        board[index] = player;
-        event.target.innerText = player;
-        event.target.removeEventListener('click', handleCellClick);
-        if (checkWinner(board)) {
-            endGame();
-        } else {
-            aiMove();
-        }
-    }
-}
-
-// End the game
-function endGame() {
-    const winner = checkWinner(board);
-    if (winner) {
-        setTimeout(() => alert(winner === 'Tie' ? 'It\'s a tie!' : `${winner} wins!`), 10);
-        cells.forEach(cell => cell.removeEventListener('click', handleCellClick));
-    }
-}
-
-// Reset the game
-function resetGame() {
-    board.fill(null);
     cells.forEach(cell => {
-        cell.innerText = '';
-        cell.addEventListener('click', handleCellClick);
+        cell.addEventListener('click', () => {
+            const square = cell.getAttribute('data-index');
+            makeMove(square);
+        });
+    });
+
+    resetButton.addEventListener('click', function() {initializeGame()
+
+    });
+
+    initializeGame();
+
+
+
+
+
+
+//when called sends value 'start' to php sevrer as a POSt request to let it know game has started (can alos be used wfor when game is reset)
+function initializeGame(){
+    $.ajax({
+        url: 'game.php',
+        method: 'POST',
+        data: { post_value: 'start' },
+        success: function(response) { 
+            boardUI(response);
+             
+        } 
+
+    }); 
+
+    //clears board
+
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell=>{
+        cell.innerText='';
+    });
+    
+}
+
+
+//when called sends value 'play' t php server as POST reuqets
+function makeMove(value){
+    $.ajax({
+        url:'game.php',
+        method: 'POST', 
+        data: { post_value: 'play', x: value },
+        success: function(response) {
+            boardUI(response);
+            if (response.winning_state) {
+                setTimeout(function() {
+                    alert(response.winning_state === 'DRAW' ? 'It is a draw! ' : response.winning_state + ' wins!');
+                }, 10);
+            }
+        }
     });
 }
 
-resetButton.addEventListener('click', resetGame);
 
-// Initialize game
-resetGame();
+//This function updates the UI of the board
+function boardUI(data){
+    const cells = document.querySelectorAll('.cell');
+
+    data.ttt_board.forEach((value, index) => {
+            cells[index].innerText = value ? value : '';
+        });
+    }
+
+
+});
