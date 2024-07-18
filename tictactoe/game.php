@@ -4,122 +4,113 @@ header('Content-Type: application/json');
 
 if(isset($_POST['post_value'])){
     $post_value = $_POST['post_value'];
-}
-else{
-    $post_value ='';
-}
-
-//if stament that checks if post value var is empty or not. if not the checks if the game just started and initializes the game. if not then check if a player is making a move. Else returns the leaderboard to display it.
-if($post_value===''){
-    $response= ['error' => 'Invalid action'];
+} else {
+    $post_value = '';
 }
 
-elseif($post_value==='start'){
-    $response=initializeGame();
-}
-
-elseif($post_value==='play'){
-    
-    if(isset($_POST['x'])){
-        $x= intval($_POST['x']);
+if($post_value === '') {
+    $response = ['error' => 'Invalid action'];
+} elseif($post_value === 'start') {
+    $response = initializeGame();
+} elseif($post_value === 'play') {
+    if(isset($_POST['x'])) {
+        $x = intval($_POST['x']);
+    } else {
+        $x = -1;
     }
-    else{
-        $x= -1;
-    }
-    
-    $response=makeMove($x);
-
+    $response = makeMove($x);
+} elseif($post_value === 'computer_play') {
+    $response = computerMove();
+} else {
+    $response = getGameboard();
 }
-
-else{
-    $response=getGameboard();
-}
-
-
 
 echo json_encode($response);
 
-
-
-
-function initializeGame(){
-    $_SESSION['game_state']=[
-        'ttt_board'=> array_fill(0, 9, null),
+function initializeGame() {
+    $_SESSION['game_state'] = [
+        'ttt_board' => array_fill(0, 9, null),
         'player' => 'X',
         'winning_state' => null
     ];
+    return $_SESSION['game_state'];
 }
 
 function getGameboard() {
-    return array_count_values($_SESSION['game_board']);
+    return $_SESSION['game_state'];
 }
 
-
-function boardUpdateAfterWin($winning_state){
-    if($winning_state!=='DRAW'){
-        
-        //if there are less than 10 winners on the leaderboard add new winner on leaderboard and if there are 10 winners (X or O) replaces oldest one with newest one
-        if(count($_SESSION['$game_board'])<10){
-            $_SESSION['game_board'][] =$winning_state;
-        }
-        else{
-            array_shift($_SESSION['$game_board']);
-            $_SESSION['game_board'][] =$winning_state;
+function boardUpdateAfterWin($winning_state) {
+    if($winning_state !== 'DRAW') {
+        if(count($_SESSION['game_board']) < 10) {
+            $_SESSION['game_board'][] = $winning_state;
+        } else {
+            array_shift($_SESSION['game_board']);
+            $_SESSION['game_board'][] = $winning_state;
         }
     }
 }
 
+function gameOver($ttt_board) {
+    $all_winning_combination = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
 
-function gameOver($ttt_board){
-    $all_winning_combination = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; 
-   
     foreach ($all_winning_combination as $tmp) {
         [$sqr1, $sqr2, $sqr3] = $tmp;
-
-
         if ($ttt_board[$sqr1] !== null && $ttt_board[$sqr1] === $ttt_board[$sqr2] && $ttt_board[$sqr2] === $ttt_board[$sqr3]) {
             return true;
         }
-     }
+    }
     return false;
-
 }
 
-
 function makeMove($index_of_square) {
-
     if ($_SESSION['game_state']['winning_state'] !== null || $_SESSION['game_state']['ttt_board'][$index_of_square] !== null) {
         return $_SESSION['game_state'];
     }
 
     $_SESSION['game_state']['ttt_board'][$index_of_square] = $_SESSION['game_state']['player'];
 
-    
     if (gameOver($_SESSION['game_state']['ttt_board'])) {
         $_SESSION['game_state']['winning_state'] = $_SESSION['game_state']['player'];
-        
         boardUpdateAfterWin($_SESSION['game_state']['winning_state']);
-    } 
-    
-    elseif (!in_array(null, $_SESSION['game_state']['ttt_board'])) {
+    } elseif (!in_array(null, $_SESSION['game_state']['ttt_board'])) {
         $_SESSION['game_state']['winning_state'] = 'DRAW';
-    } 
-    
-    else {
-        
-        if($_SESSION['game_state']['player'] === 'X'){
-            $_SESSION['game_state']['player'] ='O';    
+    } else {
+        if ($_SESSION['game_state']['player'] === 'X') {
+            $_SESSION['game_state']['player'] = 'O';
+        } else {
+            $_SESSION['game_state']['player'] = 'X';
         }
-        
-        else{
-            $_SESSION['game_state']['player'] ='X';    
-        }
-        
-     }
-
-
+    }
     return $_SESSION['game_state'];
 }
 
+function computerMove() {
+    $available_moves = [];
+    foreach ($_SESSION['game_state']['ttt_board'] as $index => $value) {
+        if ($value === null) {
+            $available_moves[] = $index;
+        }
+    }
 
+    if (count($available_moves) > 0) {
+        $random_move = $available_moves[array_rand($available_moves)];
+        $_SESSION['game_state']['ttt_board'][$random_move] = 'O';
+
+        if (gameOver($_SESSION['game_state']['ttt_board'])) {
+            $_SESSION['game_state']['winning_state'] = 'O';
+            boardUpdateAfterWin($_SESSION['game_state']['winning_state']);
+        } elseif (!in_array(null, $_SESSION['game_state']['ttt_board'])) {
+            $_SESSION['game_state']['winning_state'] = 'DRAW';
+        } else {
+            $_SESSION['game_state']['player'] = 'X';
+        }
+    }
+
+    return $_SESSION['game_state'];
+}
 ?>
