@@ -2,6 +2,10 @@
 
 header('Content-Type: application/json');
 
+if (!isset($_SESSION['game_board'])) {
+    $_SESSION['game_board'] = []; // Initializaton of leaderboard
+}
+
 if(isset($_POST['post_value'])){
     $post_value = $_POST['post_value'];
 } else {
