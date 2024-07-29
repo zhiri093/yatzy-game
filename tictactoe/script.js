@@ -13,6 +13,13 @@ $(document).ready(function() {
         initializeGame();
     });
 
+
+    $('#user-form').on('submit', function(event) {
+        event.preventDefault();
+        saveUser();
+    });
+
+    
     initializeGame();
 
     function initializeGame() {
