@@ -11,6 +11,7 @@ $(document).ready(function() {
 
     resetButton.addEventListener('click', function() {
         initializeGame();
+        fetchLeaderboard();
     });
 
 
@@ -19,8 +20,9 @@ $(document).ready(function() {
         saveUser();
     });
 
-    
+
     initializeGame();
+    fetchLeaderboard();
 
     function initializeGame() {
         $.ajax({
@@ -81,4 +83,21 @@ $(document).ready(function() {
             cells[index].innerText = value ? value : '';
         });
     }
+
+    function fetchLeaderboard() {
+        $.ajax({
+            url: 'game.php',
+            method: 'POST',
+            data: { post_value: 'leaderboard' },
+            success: function(response) {
+                let leaderboardHTML = '<h3>Last 10 wins</h3><table><tr><th>Player</th><th>Score</th></tr>';
+                response.forEach(entry => {
+                    leaderboardHTML += `<tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>`;
+                });
+                leaderboardHTML += '</table>';
+                $('#leaderboard').html(leaderboardHTML);
+            }
+        });
+    }
+
 });

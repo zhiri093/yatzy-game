@@ -25,7 +25,9 @@ if($post_value === '') {
     $response = makeMove($x);
 } elseif($post_value === 'computer_play') {
     $response = computerMove();
-} else {
+} elseif ($post_value === 'leaderboard') {
+    $response = getLeaderboard();
+}else {
     $response = getGameboard();
 }
 
@@ -116,5 +118,18 @@ function computerMove() {
     }
 
     return $_SESSION['game_state'];
+}
+
+function getLeaderboard() {
+    $leaderboard = array_count_values(array_filter($_SESSION['game_board'])); // Count occurrences
+    arsort($leaderboard); // Sort by count in descending order
+    $top_leaderboard = array_slice($leaderboard, 0, 10, true); // Get topp 10 
+
+    $formatted_leaderboard = [];
+    foreach ($top_leaderboard as $player => $score) {
+        $formatted_leaderboard[] = ['player_name' => $player, 'score' => $score];
+    }
+
+    return $formatted_leaderboard;
 }
 ?>

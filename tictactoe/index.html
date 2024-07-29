@@ -6,34 +6,44 @@
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
 <body>
     <div class="container">
+        <div class="game-leaderboard-container">
+            <div class="game-container">
+                <h1>Tic Tac Toe</h1>
+                <div class="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+                <button id="reset">Reset</button>
+                <br><br>
+                
+
+                
+            </div>
+
+            <div id="leaderboard">
+                <!-- Leaderboard will be injected here -->
+            </div>
+        </div>
 
         <form id="user-form" class="user-form">
-        <h3>Input User Info</h3>
-        <input type="text" id="name" name="name" placeholder="Name" required><br><br>
-        <input type="text" id="username" name="username" placeholder="Username" required><br><br>
-        <input type="text" id="location" name="location" placeholder="Location" required><br><br>
-        <button type="submit">Add User</button>
-    </form></div>
-    
-    <div class="container">
-        <h1>Tic Tac Toe</h1>
-        <div class="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
-        </div>
-        <button id="reset">Reset</button>
+            <h3>Input User Info</h3>
+            <input type="text" id="name" name="name" placeholder="Name" required><br><br>
+            <input type="text" id="username" name="username" placeholder="Username" required><br><br>
+            <input type="text" id="location" name="location" placeholder="Location" required><br><br>
+            <button type="submit">Add User</button>
+        </form>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

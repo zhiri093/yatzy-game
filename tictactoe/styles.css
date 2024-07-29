@@ -8,7 +8,23 @@ body {
     margin: 0;
 }
 
+
 .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.game-leaderboard-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px; /* Adjust as needed */
+}
+
+.game-container {
+    flex: 1;
     text-align: center;
 }
 
@@ -46,3 +62,26 @@ button {
     padding: 10px;
     border-radius: 10%;
 }
+
+#leaderboard {
+    flex: 0 0 20%; /* Adjust the width as needed */
+    margin-left: 30%;
+}
+
+#leaderboard table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#leaderboard th, #leaderboard td {
+    border: 1px solid #333;
+    padding: 8px;
+    text-align: left;
+}
+
+#reset {
+    margin-top: 2%;
+}
+
+
+.user-form{margin-top: -90%;}
