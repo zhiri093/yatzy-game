@@ -4,7 +4,7 @@ session_start();
 header('Content-Type: application/json');
 
 $dsn = 'pgsql:host=localhost;port=5432;dbname=tictactoe;';
-$username = 'postgres';  // Replace with your PostgreSQL username
+$username = 'tictactoe';  // Replace with your PostgreSQL username
 $password = '12345';  // Replace with your PostgreSQL password
 
 try {
