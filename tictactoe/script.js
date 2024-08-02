@@ -14,12 +14,10 @@ $(document).ready(function() {
         fetchLeaderboard();
     });
 
-
     $('#user-form').on('submit', function(event) {
         event.preventDefault();
         saveUser();
     });
-
 
     initializeGame();
     fetchLeaderboard();
@@ -100,4 +98,28 @@ $(document).ready(function() {
         });
     }
 
+    function saveUser() {
+        const name = $('#name').val();
+        const username = $('#username').val();
+        const location = $('#location').val();
+
+        $.ajax({
+            url: 'game.php',
+            method: 'POST',
+            data: {
+                post_value: 'save_user',
+                name: name,
+                username: username,
+                location: location
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.success);
+                    fetchLeaderboard();
+                } else {
+                    alert(response.error);
+                }
+            }
+        });
+    }
 });
