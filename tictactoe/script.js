@@ -92,7 +92,7 @@ $(document).ready(function() {
             success: function(response) {
                 let leaderboardHTML = '<h3>Last 10 wins</h3><table><tr><th>Player</th><th>Score</th></tr>';
                 response.forEach(entry => {
-                    leaderboardHTML += <tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>;
+                    leaderboardHTML += `<tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>`;
                 });
                 leaderboardHTML += '</table>';
                 $('#leaderboard').html(leaderboardHTML);
