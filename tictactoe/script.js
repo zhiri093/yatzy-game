@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
     const cells = document.querySelectorAll('.cell');
     const resetButton = document.getElementById('reset');
@@ -99,29 +100,7 @@ $(document).ready(function() {
             }
         });
     }
-function saveUser() {
-        const name = $('#name').val();
-        const username = $('#username').val();
-        const location = $('#location').val();
-
-        $.ajax({
-            url: 'game.php',
-            method: 'POST',
-            data: {
-                post_value: 'save_user',
-                name: name,
-                username: username,
-                location: location
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert('User saved successfully');
-                } else {
-                    alert('Failed to save user');
-                }
-            }
-        });
-    }
 
 });
+
 

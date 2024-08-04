@@ -2,19 +2,6 @@
 
 header('Content-Type: application/json');
 
-// Database connection
-$host = 'localhost';
-$dbname = 'tictactoe_db';
-$username = 'tictactoe';
-$password = '12345';
-$dsn = "pgsql:host=$host;dbname=$dbname";
-
-try {
-    $pdo = new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
 if (!isset($_SESSION['game_board'])) {
     $_SESSION['game_board'] = []; // Initializaton of leaderboard
 }
@@ -144,17 +131,5 @@ function getLeaderboard() {
     }
 
     return $formatted_leaderboard;
-}
-function saveUser($name, $username, $location) {
-    global $pdo;
-    $stmt = $pdo->prepare("INSERT INTO users (name, username, location) VALUES (:name, :username, :location)");
-    $stmt->bindParam(':name', $name);
-    $stmt->bindParam(':username', $username);
-    $stmt->bindParam(':location', $location);
-    if ($stmt->execute()) {
-        return ['success' => 'User added successfully'];
-    } else {
-        return ['error' => 'Failed to add user'];
-    }
 }
 ?>
