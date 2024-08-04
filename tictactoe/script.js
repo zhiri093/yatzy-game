@@ -14,10 +14,12 @@ $(document).ready(function() {
         fetchLeaderboard();
     });
 
+
     $('#user-form').on('submit', function(event) {
         event.preventDefault();
         saveUser();
     });
+
 
     initializeGame();
     fetchLeaderboard();
@@ -90,7 +92,7 @@ $(document).ready(function() {
             success: function(response) {
                 let leaderboardHTML = '<h3>Last 10 wins</h3><table><tr><th>Player</th><th>Score</th></tr>';
                 response.forEach(entry => {
-                    leaderboardHTML += `<tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>`;
+                    leaderboardHTML += <tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>;
                 });
                 leaderboardHTML += '</table>';
                 $('#leaderboard').html(leaderboardHTML);
@@ -98,28 +100,4 @@ $(document).ready(function() {
         });
     }
 
-    function saveUser() {
-        const name = $('#name').val();
-        const username = $('#username').val();
-        const location = $('#location').val();
-
-        $.ajax({
-            url: 'game.php',
-            method: 'POST',
-            data: {
-                post_value: 'save_user',
-                name: name,
-                username: username,
-                location: location
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert(response.success);
-                    fetchLeaderboard();
-                } else {
-                    alert(response.error);
-                }
-            }
-        });
-    }
 });

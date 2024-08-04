@@ -1,37 +1,35 @@
-<?php
-session_start();
+<?php session_start();
 
 header('Content-Type: application/json');
 
-$dsn = 'pgsql:host=localhost;port=5432;dbname=tictactoe;';
-$username = 'tictactoe';  // Replace with your PostgreSQL username
-$password = '12345';  // Replace with your PostgreSQL password
-
-try {
-    $pdo = new PDO($dsn, $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-} catch (PDOException $e) {
-    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
-    exit;
-}
-
 if (!isset($_SESSION['game_board'])) {
-    $_SESSION['game_board'] = []; // Initialization of leaderboard
+    $_SESSION['game_board'] = []; // Initializaton of leaderboard
 }
 
-$post_value = $_POST['post_value'] ?? '';
+if(isset($_POST['post_value'])){
+    $post_value = $_POST['post_value'];
+} else {
+    $post_value = '';
+}
 
-$response = match ($post_value) {
-    '' => ['error' => 'Invalid action'],
-    'start' => initializeGame(),
-    'play' => makeMove(intval($_POST['x'] ?? -1)),
-    'computer_play' => computerMove(),
-    'leaderboard' => getLeaderboard(),
-    'save_user' => saveUser($pdo, $_POST['name'], $_POST['username'], $_POST['location']),
-    default => getGameboard()
-};
+if($post_value === '') {
+    $response = ['error' => 'Invalid action'];
+} elseif($post_value === 'start') {
+    $response = initializeGame();
+} elseif($post_value === 'play') {
+    if(isset($_POST['x'])) {
+        $x = intval($_POST['x']);
+    } else {
+        $x = -1;
+    }
+    $response = makeMove($x);
+} elseif($post_value === 'computer_play') {
+    $response = computerMove();
+} elseif ($post_value === 'leaderboard') {
+    $response = getLeaderboard();
+}else {
+    $response = getGameboard();
+}
 
 echo json_encode($response);
 
@@ -49,8 +47,8 @@ function getGameboard() {
 }
 
 function boardUpdateAfterWin($winning_state) {
-    if ($winning_state !== 'DRAW') {
-        if (count($_SESSION['game_board']) < 10) {
+    if($winning_state !== 'DRAW') {
+        if(count($_SESSION['game_board']) < 10) {
             $_SESSION['game_board'][] = $winning_state;
         } else {
             array_shift($_SESSION['game_board']);
@@ -82,4 +80,56 @@ function makeMove($index_of_square) {
 
     $_SESSION['game_state']['ttt_board'][$index_of_square] = $_SESSION['game_state']['player'];
 
-    if (gameOver($_SESSION['game
+    if (gameOver($_SESSION['game_state']['ttt_board'])) {
+        $_SESSION['game_state']['winning_state'] = $_SESSION['game_state']['player'];
+        boardUpdateAfterWin($_SESSION['game_state']['winning_state']);
+    } elseif (!in_array(null, $_SESSION['game_state']['ttt_board'])) {
+        $_SESSION['game_state']['winning_state'] = 'DRAW';
+    } else {
+        if ($_SESSION['game_state']['player'] === 'X') {
+            $_SESSION['game_state']['player'] = 'O';
+        } else {
+            $_SESSION['game_state']['player'] = 'X';
+        }
+    }
+    return $_SESSION['game_state'];
+}
+
+function computerMove() {
+    $available_moves = [];
+    foreach ($_SESSION['game_state']['ttt_board'] as $index => $value) {
+        if ($value === null) {
+            $available_moves[] = $index;
+        }
+    }
+
+    if (count($available_moves) > 0) {
+        $random_move = $available_moves[array_rand($available_moves)];
+        $_SESSION['game_state']['ttt_board'][$random_move] = 'O';
+
+        if (gameOver($_SESSION['game_state']['ttt_board'])) {
+            $_SESSION['game_state']['winning_state'] = 'O';
+            boardUpdateAfterWin($_SESSION['game_state']['winning_state']);
+        } elseif (!in_array(null, $_SESSION['game_state']['ttt_board'])) {
+            $_SESSION['game_state']['winning_state'] = 'DRAW';
+        } else {
+            $_SESSION['game_state']['player'] = 'X';
+        }
+    }
+
+    return $_SESSION['game_state'];
+}
+
+function getLeaderboard() {
+    $leaderboard = array_count_values(array_filter($_SESSION['game_board'])); // Count occurrences
+    arsort($leaderboard); // Sort by count in descending order
+    $top_leaderboard = array_slice($leaderboard, 0, 10, true); // Get topp 10 
+
+    $formatted_leaderboard = [];
+    foreach ($top_leaderboard as $player => $score) {
+        $formatted_leaderboard[] = ['player_name' => $player, 'score' => $score];
+    }
+
+    return $formatted_leaderboard;
+}
+?>
