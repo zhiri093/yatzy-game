@@ -14,12 +14,10 @@ $(document).ready(function() {
         fetchLeaderboard();
     });
 
-
     $('#user-form').on('submit', function(event) {
         event.preventDefault();
         saveUser();
     });
-
 
     initializeGame();
     fetchLeaderboard();
@@ -30,11 +28,10 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'start' },
             success: function(response) {
-                boardUI(response);
+                updateBoardUI(response);
             }
         });
 
-        const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => {
             cell.innerText = '';
         });
@@ -46,15 +43,13 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'play', x: value },
             success: function(response) {
-                boardUI(response);
+                updateBoardUI(response);
                 if (response.winning_state) {
                     setTimeout(function() {
-                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : response.winning_state + ' wins!');
-                    }, 10);
+                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : `${response.winning_state} wins!`);
+                    }, 100);
                 } else {
-                    if (response.player === 'O') {
-                        computerMove();
-                    }
+                    computerMove();
                 }
             }
         });
@@ -66,21 +61,19 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'computer_play' },
             success: function(response) {
-                boardUI(response);
+                updateBoardUI(response);
                 if (response.winning_state) {
                     setTimeout(function() {
-                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : response.winning_state + ' wins!');
-                    }, 10);
+                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : `${response.winning_state} wins!`);
+                    }, 100);
                 }
             }
         });
     }
 
-    function boardUI(data) {
-        const cells = document.querySelectorAll('.cell');
-
-        data.ttt_board.forEach((value, index) => {
-            cells[index].innerText = value ? value : '';
+    function updateBoardUI(gameState) {
+        cells.forEach((cell, index) => {
+            cell.innerText = gameState.ttt_board[index] || '';
         });
     }
 
@@ -90,14 +83,38 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'leaderboard' },
             success: function(response) {
-                let leaderboardHTML = '<h3>Last 10 wins</h3><table><tr><th>Player</th><th>Score</th></tr>';
+                const leaderboard = document.getElementById('leaderboard');
+                leaderboard.innerHTML = '';
                 response.forEach(entry => {
-                    leaderboardHTML += `<tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>`;
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${entry.player_name}: ${entry.score}`;
+                    leaderboard.appendChild(listItem);
                 });
-                leaderboardHTML += '</table>';
-                $('#leaderboard').html(leaderboardHTML);
             }
         });
     }
 
+    function saveUser() {
+        const name = $('#name').val();
+        const username = $('#username').val();
+        const location = $('#location').val();
+
+        $.ajax({
+            url: 'game.php',
+            method: 'POST',
+            data: {
+                post_value: 'save_user',
+                name: name,
+                username: username,
+                location: location
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('User saved successfully!');
+                } else {
+                    alert('Error saving user: ' + response.error);
+                }
+            }
+        });
+    }
 });
