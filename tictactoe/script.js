@@ -14,10 +14,12 @@ $(document).ready(function() {
         fetchLeaderboard();
     });
 
+
     $('#user-form').on('submit', function(event) {
         event.preventDefault();
         saveUser();
     });
+
 
     initializeGame();
     fetchLeaderboard();
@@ -28,10 +30,11 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'start' },
             success: function(response) {
-                updateBoardUI(response);
+                boardUI(response);
             }
         });
 
+        const cells = document.querySelectorAll('.cell');
         cells.forEach(cell => {
             cell.innerText = '';
         });
@@ -43,13 +46,15 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'play', x: value },
             success: function(response) {
-                updateBoardUI(response);
+                boardUI(response);
                 if (response.winning_state) {
                     setTimeout(function() {
-                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : `${response.winning_state} wins!`);
-                    }, 100);
+                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : response.winning_state + ' wins!');
+                    }, 10);
                 } else {
-                    computerMove();
+                    if (response.player === 'O') {
+                        computerMove();
+                    }
                 }
             }
         });
@@ -61,19 +66,21 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'computer_play' },
             success: function(response) {
-                updateBoardUI(response);
+                boardUI(response);
                 if (response.winning_state) {
                     setTimeout(function() {
-                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : `${response.winning_state} wins!`);
-                    }, 100);
+                        alert(response.winning_state === 'DRAW' ? 'It is a draw!' : response.winning_state + ' wins!');
+                    }, 10);
                 }
             }
         });
     }
 
-    function updateBoardUI(gameState) {
-        cells.forEach((cell, index) => {
-            cell.innerText = gameState.ttt_board[index] || '';
+    function boardUI(data) {
+        const cells = document.querySelectorAll('.cell');
+
+        data.ttt_board.forEach((value, index) => {
+            cells[index].innerText = value ? value : '';
         });
     }
 
@@ -83,18 +90,16 @@ $(document).ready(function() {
             method: 'POST',
             data: { post_value: 'leaderboard' },
             success: function(response) {
-                const leaderboard = document.getElementById('leaderboard');
-                leaderboard.innerHTML = '';
+                let leaderboardHTML = '<h3>Last 10 wins</h3><table><tr><th>Player</th><th>Score</th></tr>';
                 response.forEach(entry => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${entry.player_name}: ${entry.score}`;
-                    leaderboard.appendChild(listItem);
+                    leaderboardHTML += `<tr><td>${entry.player_name}</td><td>${entry.score}</td></tr>`;
                 });
+                leaderboardHTML += '</table>';
+                $('#leaderboard').html(leaderboardHTML);
             }
         });
     }
-
-    function saveUser() {
+function saveUser() {
         const name = $('#name').val();
         const username = $('#username').val();
         const location = $('#location').val();
@@ -110,11 +115,13 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('User saved successfully!');
+                    alert('User saved successfully');
                 } else {
-                    alert('Error saving user: ' + response.error);
+                    alert('Failed to save user');
                 }
             }
         });
     }
+
 });
+

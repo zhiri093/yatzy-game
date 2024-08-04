@@ -1,5 +1,5 @@
-<?php
-session_start();
+<?php session_start();
+
 header('Content-Type: application/json');
 
 // Database connection
@@ -16,40 +16,31 @@ try {
 }
 
 if (!isset($_SESSION['game_board'])) {
-    $_SESSION['game_board'] = []; // Initialization of leaderboard
+    $_SESSION['game_board'] = []; // Initializaton of leaderboard
 }
 
-if (isset($_POST['post_value'])) {
+if(isset($_POST['post_value'])){
     $post_value = $_POST['post_value'];
 } else {
     $post_value = '';
 }
 
-if ($post_value === '') {
+if($post_value === '') {
     $response = ['error' => 'Invalid action'];
-} elseif ($post_value === 'start') {
+} elseif($post_value === 'start') {
     $response = initializeGame();
-} elseif ($post_value === 'play') {
-    if (isset($_POST['x'])) {
+} elseif($post_value === 'play') {
+    if(isset($_POST['x'])) {
         $x = intval($_POST['x']);
     } else {
         $x = -1;
     }
     $response = makeMove($x);
-} elseif ($post_value === 'computer_play') {
+} elseif($post_value === 'computer_play') {
     $response = computerMove();
 } elseif ($post_value === 'leaderboard') {
     $response = getLeaderboard();
-} elseif ($post_value === 'save_user') {
-    if (isset($_POST['name']) && isset($_POST['username']) && isset($_POST['location'])) {
-        $name = $_POST['name'];
-        $username = $_POST['username'];
-        $location = $_POST['location'];
-        $response = saveUser($name, $username, $location);
-    } else {
-        $response = ['error' => 'Missing user information'];
-    }
-} else {
+}else {
     $response = getGameboard();
 }
 
@@ -69,8 +60,8 @@ function getGameboard() {
 }
 
 function boardUpdateAfterWin($winning_state) {
-    if ($winning_state !== 'DRAW') {
-        if (count($_SESSION['game_board']) < 10) {
+    if($winning_state !== 'DRAW') {
+        if(count($_SESSION['game_board']) < 10) {
             $_SESSION['game_board'][] = $winning_state;
         } else {
             array_shift($_SESSION['game_board']);
@@ -145,7 +136,7 @@ function computerMove() {
 function getLeaderboard() {
     $leaderboard = array_count_values(array_filter($_SESSION['game_board'])); // Count occurrences
     arsort($leaderboard); // Sort by count in descending order
-    $top_leaderboard = array_slice($leaderboard, 0, 10, true); // Get top 10 
+    $top_leaderboard = array_slice($leaderboard, 0, 10, true); // Get topp 10 
 
     $formatted_leaderboard = [];
     foreach ($top_leaderboard as $player => $score) {
@@ -154,7 +145,6 @@ function getLeaderboard() {
 
     return $formatted_leaderboard;
 }
-
 function saveUser($name, $username, $location) {
     global $pdo;
     $stmt = $pdo->prepare("INSERT INTO users (name, username, location) VALUES (:name, :username, :location)");
@@ -167,3 +157,4 @@ function saveUser($name, $username, $location) {
         return ['error' => 'Failed to add user'];
     }
 }
+?>
